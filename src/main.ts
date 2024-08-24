@@ -1,24 +1,38 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+async function copyToClipboard(text: string) {
+  try {
+    if (!navigator.clipboard) {
+      throw new Error("Clipboard API not available");
+    }
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+    await navigator.clipboard.writeText(text);
+    console.log("Copied to clipboard", text);
+  } catch (e) {
+    console.error("Failed to copy to clipboard", e);
+  }
+}
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+function handleButtonClick(event: MouseEvent) {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  const button = event.target as HTMLButtonElement;
+  const span = button.nextElementSibling as HTMLSpanElement;
+
+  copyToClipboard(span.textContent!);
+}
+
+[...document.querySelectorAll("span")]
+  .filter((span) => !!span.textContent)
+  .filter((span) => RegExp(/^SIM-\d+$/).exec(span.textContent!))
+  .forEach((span) => {
+    const button = document.createElement("button");
+
+    button.className = "copy-button";
+    button.textContent = "Copy";
+    button.onclick = handleButtonClick;
+
+    const parent = span.parentElement;
+
+    parent?.insertBefore(button, span);
+    span.style.border = "1px solid red";
+  });

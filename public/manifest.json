@@ -1,0 +1,16 @@
+{
+  "name": "Smart Jira Copy",
+  "description": "Easily copy Jira ticket numbers from anywhere",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.atlassian.net/*"],
+      "js": ["index.js"]
+    }
+  ]
+}
