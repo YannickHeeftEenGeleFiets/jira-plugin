@@ -1,38 +1,14 @@
-async function copyToClipboard(text: string) {
-  try {
-    if (!navigator.clipboard) {
-      throw new Error("Clipboard API not available");
-    }
+import { CopyTicketNumberButton } from "./components/jira/CopyTicketNumberButton";
+import { filterByContainsTicketNumber } from "./utils/filterByContainsTicketNumber";
 
-    await navigator.clipboard.writeText(text);
-    console.log("Copied to clipboard", text);
-  } catch (e) {
-    console.error("Failed to copy to clipboard", e);
-  }
-}
+setInterval(() => {
+  filterByContainsTicketNumber(RegExp(/^SIM-\d+$/))(
+    ...document.querySelectorAll("span")
+  ).forEach((span: Node | HTMLElement) => {
+    console.groupCollapsed(`[${span.textContent}] Detected Jira ticket number`);
+    console.info(span.parentElement);
+    console.groupEnd();
 
-function handleButtonClick(event: MouseEvent) {
-  event.preventDefault();
-  event.stopImmediatePropagation();
-
-  const button = event.target as HTMLButtonElement;
-  const span = button.nextElementSibling as HTMLSpanElement;
-
-  copyToClipboard(span.textContent!);
-}
-
-[...document.querySelectorAll("span")]
-  .filter((span) => !!span.textContent)
-  .filter((span) => RegExp(/^SIM-\d+$/).exec(span.textContent!))
-  .forEach((span) => {
-    const button = document.createElement("button");
-
-    button.className = "copy-button";
-    button.textContent = "Copy";
-    button.onclick = handleButtonClick;
-
-    const parent = span.parentElement;
-
-    parent?.insertBefore(button, span);
-    span.style.border = "1px solid red";
+    span.appendChild(CopyTicketNumberButton(span.textContent!));
   });
+}, 1_000);
